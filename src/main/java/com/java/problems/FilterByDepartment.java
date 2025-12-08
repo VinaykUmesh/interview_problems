@@ -23,24 +23,34 @@ class Students {
         return id;
     }
 
-    public void setId(int id) {
+    public String getName() {
+        return name;
+    }
+
+    public String getDept() {
+        return dept;
+    }
+}
+
+class Employee {
+    int id;
+    String name;
+    String department;
+    double salary;
+
+    public Employee(int id, String name, String department, double salary) {
         this.id = id;
+        this.name = name;
+        this.department = department;
+        this.salary = salary;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDept() {
-        return dept;
-    }
-
-    public void setDept(String dept) {
-        this.dept = dept;
+    public double getSalary() {
+        return salary;
     }
 }
 
@@ -134,6 +144,57 @@ public class FilterByDepartment {
         System.out.println(aa.stream().filter(i -> !set.add(i)).collect(Collectors.toSet()));
 
         System.out.println(Stream.iterate(new int[]{0, 1}, f -> new int[]{f[1], f[0] + f[1]}).limit(10).map(f -> f[0]).collect(Collectors.toList()));
+
+
+
+        // Get Highest salary and build result in type: Map<String, Employee>
+        List<Employee> employees = new ArrayList<>();
+        employees.add(new Employee(1, "umesh", "CSE", 30000));
+        employees.add(new Employee(2, "mahesh", "MECH", 40000));
+        employees.add(new Employee(3, "suresh", "CSE", 50000));
+        employees.add(new Employee(4, "ramesh", "AERO", 30000));
+        employees.add(new Employee(5, "vignesh", "CSE", 20000));
+        employees.add(new Employee(6, "ganesh", "AERO", 15000));
+        employees.add(new Employee(7, "karthi", "MECH", 24000));
+        employees.add(new Employee(8, "mani", "CIVIL", 23000));
+        employees.add(new Employee(9, "kiran", "CIVIL", 18000));
+
+        Optional<Employee> maxSal = employees.stream().max(Comparator.comparingDouble(Employee::getSalary));
+
+        Map<String, Employee> employeeMap = maxSal
+                .map(employee -> Collections.singletonMap(employee.department, employee))
+                .orElse(Collections.emptyMap());
+
+        employeeMap.forEach((key, value) -> System.out.println(key + " " + value.getName()));
+
+//        1. Sort map2 (salary map) in reverse order of salary
+//        2. Use the key from map1 (ID) by matching the name
+//        Output should be:
+//              ID – Name – Salary (in descending salary order)
+
+        Map<Integer, String> map1 = new HashMap<>();
+        map1.put(101, "Rahul");
+        map1.put(103, "Raj");
+        map1.put(106, "Chinna");
+        map1.put(105, "Rahim");
+        Map<String, Double> map2 = new HashMap<>();
+        map2.put("Chinna", 50000.0);
+        map2.put("Rahim", 60000.0);
+        map2.put("Raj", 70000.0);
+        map2.put("Rahul", 20000.0);
+
+        map2.entrySet().stream().sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .forEach(afterSorted -> {
+                    String name = afterSorted.getKey();
+                    Double salary = afterSorted.getValue();
+
+                    Integer id = map1.entrySet().stream()
+                            .filter(x -> x.getValue().equals(name))
+                            .map(Map.Entry::getKey)
+                            .findFirst()
+                            .orElse(null);
+                    System.out.println(id + " - " + name + " - " + salary);
+                });
 
     }
 
